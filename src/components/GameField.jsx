@@ -1,35 +1,41 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import model from './loader';
-import explosion from './explosion';
+// import explosion from './explosion';
 import lavaLoader from './lava';
 import roadLoader from './road';
-import enemyLoader from './enemy';
 import cloudsLoaader from './clouds';
 import GameOverScreen from './GameOverScreen';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import flexing from './flexing';
+import combo from './enemyModel';
 
 export const GameField = () => {
 const canvasRef = useRef(null);
 const [width, setWidth] = useState(window.innerWidth);
 const [height, setHeight] = useState(window.innerHeight);
 const [gameStarted, setGameStarted] = useState(true);
+const [cameraPositionX, setCameraPositionX] = useState(0)
 // const [score, setScore] = useState(0);
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(100, width / height, 1, 100);
+const camera = new THREE.PerspectiveCamera(65, width / height, 0.2, 150);
+camera.position.set(cameraPositionX, 3, 8);
+camera.lookAt(cameraPositionX, 1, 5);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 
 const textureLoader = new THREE.TextureLoader();
 const clock = new THREE.Clock();
 
+
+
 useEffect(() => {
 let mixer;
+let enemyMixer;
 let lavaOffset = 0
 let roadOffset = 0
 
-const backgroundTexture = textureLoader.load('./sky3.jpg');
+const backgroundTexture = textureLoader.load('./cosmos.jpg');
 
 scene.background = backgroundTexture;
 
@@ -48,6 +54,24 @@ const handleResize = () => {
 
 window.addEventListener('resize', handleResize);
 
+combo.then((object) => {
+  scene.add(object[0]);
+  object[0].name = 'enemy';
+  enemyMixer = new THREE.AnimationMixer( object[0] );
+  object[0].animations = object[1].animations;
+  global.player = object[0];
+
+  const action = enemyMixer.clipAction(object[0].animations[ 0 ]);
+
+  action.loop = THREE.LoopRepeat;
+  action.repetitions = Infinity; 
+
+  action.play();
+
+  return object[0];
+});
+
+
 const avatar = model.then(object => {
   setTimeout(() => {
     let stand = scene.getObjectByName('flexing');
@@ -61,26 +85,47 @@ const avatar = model.then(object => {
 
     action.play();
 
+    let targetX = object[0].position.x;
+    const speed = 0.08;
+
     window.addEventListener('keydown', (e) => {
       if (e.key === 'a' || e.key === 'ArrowLeft') {
 
           moveLeft();
       } else if (e.key === 'd' || e.key === 'ArrowRight') {
         moveRight();
+      } else if (e.key === 'w' || e.key === 'ArrowUp') {
+        jump();
       }
     });
 
     const moveLeft = () => {
-      if (object[0].position.x > -1) {
-        object[0].position.x -= 1;
+      if (targetX > -1) {
+        setCameraPositionX((e) => e - 1);
+        targetX -= 1;
+      }
+    };
+
+    const jump = () => {
+      if (object[0].position.y === -1) 
+      {
+        object[0].position.y += 1;
       }
     };
 
     const moveRight = () => {
-      if (object[0].position.x < 1) {
-        object[0].position.x += 1;
+      if (targetX < 1) {
+        targetX += 1;
       }
     };
+
+    const updatePosition = () => {
+      object[0].position.x += (targetX - object[0].position.x) * speed;
+    
+      requestAnimationFrame(updatePosition);
+    };
+    
+    updatePosition();
   }, 2500);
 
   return object[0];
@@ -104,10 +149,11 @@ roadLoader.then(object => {
   scene.add(object[0])
 })
 
-//adding explosion on background
-explosion.then(object => {
-  scene.add(object)
-})
+// //adding explosion on background
+// explosion.then(object => {
+//   scene.add(object)
+// })
+
 
 //adding lava
 lavaLoader.then(object => {
@@ -126,11 +172,6 @@ lavaLoader.then(object => {
   canvasRef.current.appendChild(renderer.domElement);
 
   camera.position.z = 10;
-
-  //Adding devil as Hero enemy
-  enemyLoader.then(object => {
-    scene.add(object)
-  })
 
   // adding clouds on the sky
   cloudsLoaader.then(object => {
@@ -159,7 +200,10 @@ lavaLoader.then(object => {
           child.material = yellowMaterial;
         }
       });
-      coinModel.position.set(randomX(), -1, 0);
+
+      let coinModelPosition = coinModel.position.set(randomX(), -1, 0);
+
+      coinModel.position.copy(coinModelPosition)
       coinModel.scale.set(20, 20, 20)
       // setScore((prev) => prev + 1)
 
@@ -184,14 +228,12 @@ lavaLoader.then(object => {
   setTimeout(() => {
     setInterval(() => {
       createObstacle();
-    }, 500)
-  }, 3500);
-
-  setTimeout(() => {
+    }, 800)
     setInterval(() => {
       createCoins();;
-    }, 1000)
+    }, 1200)
   }, 3500);
+
 
 
   const checkCollision = async (character, obstacle) => {
@@ -207,8 +249,7 @@ lavaLoader.then(object => {
   };
 
   const moveCoins = () => {
-    let coinsSpeed = 0.05;
-
+    let coinsSpeed = 0.03;
     
     coins.forEach((coin, index) => {
       checkCollision(avatar, coin)
@@ -216,6 +257,7 @@ lavaLoader.then(object => {
         if (!collisionResult) {
           coin.position.add(obstacleDirection.clone().multiplyScalar(coinsSpeed));
         } else if (collisionResult) {
+          
           scene.remove(coin);
         }
       })
@@ -235,7 +277,7 @@ lavaLoader.then(object => {
     if(!gameStarted) {
       return
     }
-    let obstacleSpeed = 0.05;
+    let obstacleSpeed = 0.03;
 
       obstacles.forEach((obstacle, index) => {
         checkCollision(avatar, obstacle)
@@ -246,7 +288,7 @@ lavaLoader.then(object => {
               object[1].map.offset.y = lavaOffset
             });
             roadLoader.then(object => {
-              roadOffset += 0.005;
+              roadOffset += 0.004;
               object[1].map.offset.y = roadOffset
             });
             // setScore(prev => prev + 1)
@@ -275,6 +317,7 @@ lavaLoader.then(object => {
 const animate = () => {
   const delta = clock.getDelta();
   if ( mixer ) mixer.update( delta );
+  if ( enemyMixer ) enemyMixer.update( delta );
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
 };

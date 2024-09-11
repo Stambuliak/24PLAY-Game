@@ -13,7 +13,7 @@ const lavaLoader = new Promise((res, rej) => {
       new THREE.BoxGeometry(500, 1, 100),
       lavaMaterial
     );
-    lava.position.y = -5;
+    lava.position.y = -10;
     lava.scale.set(0.5, 0.5, 0.5)
 
     res([lava, lavaMaterial]);
