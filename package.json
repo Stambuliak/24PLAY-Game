@@ -1,6 +1,6 @@
 {
   "name": "my-react-app",
-  "homepage": "https://stambuliak.github.io/24PLAY-Game",
+  "homepage": "https://Stambuliak.github.io/24Play-Game",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -10,7 +10,6 @@
     "@babel/preset-react": "^7.22.15",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.3",
     "@react-three/drei": "^9.83.9",
-    "@svcordova/webpack": "^5.5.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -147,6 +146,8 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@svgr/webpack": "^8.1.0",
     "cordova-android": "^12.0.1",
     "gh-pages": "^6.1.1"
   },
