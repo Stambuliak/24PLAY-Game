@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import model from './loader';
-// import explosion from './explosion';
 import lavaLoader from './lava';
 import roadLoader from './road';
 import cloudsLoaader from './clouds';
@@ -149,12 +148,6 @@ roadLoader.then(object => {
   scene.add(object[0])
 })
 
-// //adding explosion on background
-// explosion.then(object => {
-//   scene.add(object)
-// })
-
-
 //adding lava
 lavaLoader.then(object => {
   scene.add(object[0])
@@ -172,13 +165,6 @@ lavaLoader.then(object => {
   canvasRef.current.appendChild(renderer.domElement);
 
   camera.position.z = 10;
-
-  // adding clouds on the sky
-  cloudsLoaader.then(object => {
-    object.forEach(cloud => {
-      scene.add(cloud)
-    })
-  })
 
   let obstacles = [];
   let coins = [];
