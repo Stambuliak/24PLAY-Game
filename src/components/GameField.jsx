@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import model from './loader';
 import lavaLoader from './lava';
 import roadLoader from './road';
-import cloudsLoaader from './clouds';
 import GameOverScreen from './GameOverScreen';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import flexing from './flexing';
