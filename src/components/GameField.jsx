@@ -165,15 +165,21 @@ lavaLoader.then(object => {
 
   camera.position.z = 10;
 
-  let obstacles = [];
-  let coins = [];
-
   const obstacleDirection = new THREE.Vector3(0, 0, 1);
   const randomX = () => {
     let x = Math.floor(Math.random() * 3) - 1;
 
     return x;
   }
+
+  let obstacles = [];
+  let coins = [];
+  
+  const calculateDistanceXZ = (obj1, obj2) => {
+    const dx = obj1.position.x - obj2.position.x;
+    const dz = obj1.position.z - obj2.position.z;
+    return Math.sqrt(dx * dx + dz * dz);
+  };
 
   const createCoins = () => {
     const loader = new GLTFLoader();
@@ -186,30 +192,42 @@ lavaLoader.then(object => {
         }
       });
 
-      let coinModelPosition = coinModel.position.set(randomX(), -1, 0);
-
-      coinModel.position.copy(coinModelPosition)
-      coinModel.scale.set(20, 20, 20)
-      // setScore((prev) => prev + 1)
-
+      let coinModelPosition;
+      coinModelPosition = new THREE.Vector3(randomX(), -1, 0);
+  
+      coinModel.position.copy(coinModelPosition);
+      coinModel.scale.set(20, 20, 20);
       scene.add(coinModel);
       coins.push(coinModel);
     })
   }
+
+  const MIN_DISTANCE = 1;
 
   const createObstacle = () => {
     const loader = new GLTFLoader();
     loader.load("./Flames.glb", (object) => {
       const obstacleModel = object.scene;
       obstacleModel.position.set(randomX(), -1, 0);
-      obstacleModel.name = 'obstacle';
-      obstacleModel.scale.set(20, 20, 20)
-
-      scene.add(obstacleModel);
-      obstacles.push(obstacleModel);
-    })
+  
+      let isValidPosition = true;
+  
+      // Перевіряємо відстань між новою перешкодою та всіма монетами
+      coins.forEach((coin) => {
+        if (calculateDistanceXZ(obstacleModel, coin) < MIN_DISTANCE) {
+          isValidPosition = false; // Якщо перешкода занадто близько до монети, то не додаємо її
+        }
+      });
+  
+      if (isValidPosition) {
+        obstacleModel.name = 'obstacle';
+        obstacleModel.scale.set(20, 20, 20);
+    
+        scene.add(obstacleModel);
+        obstacles.push(obstacleModel);
+      }
+    });
   };
-
   setTimeout(() => {
     setInterval(() => {
       createObstacle();
@@ -217,7 +235,7 @@ lavaLoader.then(object => {
     setInterval(() => {
       createCoins();;
     }, 1200)
-  }, 3500);
+  }, 3300);
 
 
 
