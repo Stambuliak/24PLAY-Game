@@ -7,6 +7,7 @@ import GameOverScreen from './GameOverScreen';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import flexing from './flexing';
 import combo from './enemyModel';
+import './game.css';
 
 export const GameField = () => {
 const canvasRef = useRef(null);
@@ -14,7 +15,7 @@ const [width, setWidth] = useState(window.innerWidth);
 const [height, setHeight] = useState(window.innerHeight);
 const [gameStarted, setGameStarted] = useState(true);
 const [cameraPositionX, setCameraPositionX] = useState(0)
-// const [score, setScore] = useState(0);
+const [score, setScore] = useState(0);
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(65, width / height, 0.2, 150);
@@ -228,13 +229,18 @@ lavaLoader.then(object => {
       }
     });
   };
-  setTimeout(() => {
-    setInterval(() => {
+  let obstacleTimeout;
+let obstacleInterval;
+let coinInterval;
+
+  obstacleTimeout = setTimeout(() => {
+    obstacleInterval = setInterval(() => {
       createObstacle();
-    }, 800)
-    setInterval(() => {
-      createCoins();;
-    }, 1200)
+    }, 800);
+  
+    coinInterval = setInterval(() => {
+      createCoins();
+    }, 1200);
   }, 3300);
 
 
@@ -253,25 +259,30 @@ lavaLoader.then(object => {
 
   const moveCoins = () => {
     let coinsSpeed = 0.03;
-    
+  
     coins.forEach((coin, index) => {
       checkCollision(avatar, coin)
       .then((collisionResult) => {
+        if(!gameStarted) {
+          coinsSpeed = 0;
+          clearInterval()
+        };
         if (!collisionResult) {
           coin.position.add(obstacleDirection.clone().multiplyScalar(coinsSpeed));
-        } else if (collisionResult) {
-          
+        } else {
+          setScore((prev) => prev + 1);
           scene.remove(coin);
+          coins.splice(index, 1);
         }
-      })
-    
+      });
+  
       if (coin.position.z > 9) {
         scene.remove(coin);
         coins.splice(index, 1);
       }
     });
-
-    requestAnimationFrame(moveCoins)
+  
+    requestAnimationFrame(moveCoins);
   }
 
   moveCoins();
@@ -294,9 +305,12 @@ lavaLoader.then(object => {
               roadOffset += 0.004;
               object[1].map.offset.y = roadOffset
             });
-            // setScore(prev => prev + 1)
             obstacle.position.add(obstacleDirection.clone().multiplyScalar(obstacleSpeed));
           } else if (collisionResult) {
+            coins = [];
+            clearTimeout(obstacleTimeout);
+            clearInterval(obstacleInterval);
+            clearInterval(coinInterval);
             lavaOffset = 0;
             roadOffset = 0;
             obstacleSpeed = 0;
@@ -331,10 +345,11 @@ const animate = () => {
 
   return (
     <div className="game-container">
+      <h1 className='score'>score: {score}</h1>
       <div ref={canvasRef} />
       {!gameStarted && (
         <div>
-          <GameOverScreen/>
+          <GameOverScreen score={score}/>
         </div>
       )}
     </div>
