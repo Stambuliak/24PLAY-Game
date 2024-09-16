@@ -65,6 +65,38 @@ combo.then((object) => {
   action.loop = THREE.LoopRepeat;
   action.repetitions = Infinity; 
 
+  let targetX = object[0].position.x;
+  const speed = 0.08;
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'a' || e.key === 'ArrowLeft') {
+
+        moveLeft();
+    } else if (e.key === 'd' || e.key === 'ArrowRight') {
+      moveRight();
+    }
+  });
+
+  const moveLeft = () => {
+    if (targetX > -0.25) {
+      targetX -= 0.25;
+    }
+  };
+
+  const moveRight = () => {
+    if (targetX < 0.25) {
+      targetX += 0.25;
+    }
+  };
+
+  const updatePosition = () => {
+    object[0].position.x += (targetX - object[0].position.x) * speed;
+  
+    requestAnimationFrame(updatePosition);
+  };
+  
+  updatePosition();
+
   action.play();
 
   return object[0];
@@ -138,6 +170,11 @@ roadLoader.then(object => {
   scene.add(object[0])
 })
 
+// const moveRoad = () => {roadLoader.then(object => {
+//   roadOffset += 0.009;
+//   object[1].map.offset.y = roadOffset
+// })};
+
 //adding lava
 lavaLoader.then(object => {
   scene.add(object[0])
@@ -201,10 +238,9 @@ lavaLoader.then(object => {
   
       let isValidPosition = true;
   
-      // Перевіряємо відстань між новою перешкодою та всіма монетами
       coins.forEach((coin) => {
         if (calculateDistanceXZ(obstacleModel, coin) < MIN_DISTANCE) {
-          isValidPosition = false; // Якщо перешкода занадто близько до монети, то не додаємо її
+          isValidPosition = false; 
         }
       });
   
@@ -286,12 +322,12 @@ lavaLoader.then(object => {
         .then((collisionResult) => {
           if (!collisionResult) {
             lavaLoader.then(object => {
-              lavaOffset += 0.001;
-              object[1].map.offset.y = lavaOffset
+              lavaOffset += obstacleSpeed/10;
+              object[1].map.offset.y = lavaOffset % 1;
             });
             roadLoader.then(object => {
-              roadOffset += 0.004;
-              object[1].map.offset.y = roadOffset
+              roadOffset += obstacleSpeed/3.33;
+              object[1].map.offset.y = roadOffset % 1;
             });
             obstacle.position.add(obstacleDirection.clone().multiplyScalar(obstacleSpeed));
           } else if (collisionResult) {
@@ -302,8 +338,8 @@ lavaLoader.then(object => {
             lavaOffset = 0;
             roadOffset = 0;
             obstacleSpeed = 0;
-            scene.clear()
-            setGameStarted(false)
+            scene.clear();
+            setGameStarted(false);
             return
           }
         })
@@ -313,7 +349,6 @@ lavaLoader.then(object => {
           obstacles.splice(index, 1);
         }
       });
-
     requestAnimationFrame(moveObstackles)
   }
 

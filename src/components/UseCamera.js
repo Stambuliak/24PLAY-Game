@@ -3,8 +3,8 @@ import * as THREE from 'three';
 
 export const useCamera = (width, height) => {
   const [lane, setLane] = useState(1); 
-  const lanes = [-0.45, 0, 0.45]; 
-  const camera = useRef(new THREE.PerspectiveCamera(65, width / height, 0.2, 150));
+  const lanes = [-0.5, 0, 0.3]; 
+  const camera = useRef(new THREE.PerspectiveCamera(65, width / height, 0.3, 200));
   const animationRef = useRef();
 
   useEffect(() => {
@@ -16,7 +16,7 @@ export const useCamera = (width, height) => {
     const updateCameraPosition = () => {
       const targetX = lanes[lane];
       camera.current.position.x = THREE.MathUtils.lerp(camera.current.position.x, targetX, 0.05);
-      camera.current.lookAt(camera.current.position.x, 1, 6.5);
+      // camera.current.lookAt(camera.current.position.x/2, 1, 7);
 
       animationRef.current = requestAnimationFrame(updateCameraPosition);
     };
