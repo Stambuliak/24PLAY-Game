@@ -8,25 +8,39 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import flexing from './flexing';
 import combo from './enemyModel';
 import './game.css';
+import { useCamera } from './UseCamera';
 
 export const GameField = () => {
 const canvasRef = useRef(null);
 const [width, setWidth] = useState(window.innerWidth);
 const [height, setHeight] = useState(window.innerHeight);
 const [gameStarted, setGameStarted] = useState(true);
-const [cameraPositionX, setCameraPositionX] = useState(0)
 const [score, setScore] = useState(0);
 
+const {camera, enemyPosX} = useCamera(width, height);
+
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(65, width / height, 0.2, 150);
-camera.position.set(cameraPositionX, 3, 8);
-camera.lookAt(cameraPositionX, 1, 5);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 
 const textureLoader = new THREE.TextureLoader();
 const clock = new THREE.Clock();
 
+useEffect(() => {
+  const handleResize = () => {
+    const newWidth = window.innerWidth;
+    const newHeight = window.innerHeight;
 
+    setWidth(newWidth);
+    setHeight(newHeight);
+    camera.aspect = newWidth / newHeight;
+    camera.updateProjectionMatrix();
+  };
+
+  window.addEventListener('resize', handleResize);
+  return () => {
+    window.removeEventListener('resize', handleResize);
+  };
+}, [camera]);
 
 useEffect(() => {
 let mixer;
@@ -38,21 +52,7 @@ const backgroundTexture = textureLoader.load('./cosmos.jpg');
 
 scene.background = backgroundTexture;
 
-const handleResize = () => {
-  const newWidth = window.innerWidth;
-  const newHeight = window.innerHeight;
-
-  setWidth(newWidth);
-  setHeight(newHeight);
-
-  camera.aspect = newWidth / newHeight;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(newWidth, newHeight);
-};
-
-window.addEventListener('resize', handleResize);
-
+//enemy loading
 combo.then((object) => {
   scene.add(object[0]);
   object[0].name = 'enemy';
@@ -93,22 +93,12 @@ const avatar = model.then(object => {
           moveLeft();
       } else if (e.key === 'd' || e.key === 'ArrowRight') {
         moveRight();
-      } else if (e.key === 'w' || e.key === 'ArrowUp') {
-        jump();
       }
     });
 
     const moveLeft = () => {
       if (targetX > -1) {
-        setCameraPositionX((e) => e - 1);
         targetX -= 1;
-      }
-    };
-
-    const jump = () => {
-      if (object[0].position.y === -1) 
-      {
-        object[0].position.y += 1;
       }
     };
 
@@ -163,8 +153,6 @@ lavaLoader.then(object => {
 
   renderer.setSize(width, height);
   canvasRef.current.appendChild(renderer.domElement);
-
-  camera.position.z = 10;
 
   const obstacleDirection = new THREE.Vector3(0, 0, 1);
   const randomX = () => {
@@ -230,8 +218,8 @@ lavaLoader.then(object => {
     });
   };
   let obstacleTimeout;
-let obstacleInterval;
-let coinInterval;
+  let obstacleInterval;
+  let coinInterval;
 
   obstacleTimeout = setTimeout(() => {
     obstacleInterval = setInterval(() => {
@@ -341,7 +329,11 @@ const animate = () => {
 
   animate();
 // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [height, width]);
+
+// return () => {
+//   scene.clear()
+// }
+}, [camera, height, width]);
 
   return (
     <div className="game-container">
