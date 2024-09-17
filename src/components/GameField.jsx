@@ -168,17 +168,36 @@ flexing.then(object => {
 //adding main road
 roadLoader.then(object => {
   scene.add(object[0])
-})
-
-// const moveRoad = () => {roadLoader.then(object => {
-//   roadOffset += 0.009;
-//   object[1].map.offset.y = roadOffset
-// })};
+});
 
 //adding lava
 lavaLoader.then(object => {
   scene.add(object[0])
-})
+});
+
+const moveRoad = () => {roadLoader.then(object => {
+  roadOffset += 0.019;
+  object[1].map.offset.y = roadOffset % 1;
+})};
+
+const moveLava = () => {lavaLoader.then(object => {
+  lavaOffset += 0.003;
+  object[1].map.offset.y = lavaOffset % 1;
+})};
+
+const startRoadMovement = () => {
+  setTimeout(() => {
+    const animateRoad = () => {
+      moveLava();
+      moveRoad();
+      requestAnimationFrame(animateRoad); 
+    };
+    animateRoad();
+  }, 3700);
+};
+
+startRoadMovement();
+
 
   const light = new THREE.DirectionalLight('brown', 1);
   light.position.set(0, -2, 9);
@@ -321,14 +340,6 @@ lavaLoader.then(object => {
         checkCollision(avatar, obstacle)
         .then((collisionResult) => {
           if (!collisionResult) {
-            lavaLoader.then(object => {
-              lavaOffset += obstacleSpeed/10;
-              object[1].map.offset.y = lavaOffset % 1;
-            });
-            roadLoader.then(object => {
-              roadOffset += obstacleSpeed/3.33;
-              object[1].map.offset.y = roadOffset % 1;
-            });
             obstacle.position.add(obstacleDirection.clone().multiplyScalar(obstacleSpeed));
           } else if (collisionResult) {
             coins = [];
