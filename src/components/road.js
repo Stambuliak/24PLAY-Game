@@ -10,11 +10,11 @@ const roadLoader = new Promise((res, rej) => {
     const roadMaterial = new THREE.MeshStandardMaterial({ map: object });
 
     const ground = new THREE.Mesh(
-      new THREE.BoxGeometry(8, 1.1, 25),
+      new THREE.BoxGeometry(8, 1.1, 33.9),
       roadMaterial
     );
     ground.position.y = -5.8;
-    ground.position.z = 0;
+    ground.position.z = 4.3;
 
     res([ground, roadMaterial])
   })
