@@ -7,7 +7,7 @@ import GameOverScreen from './GameOverScreen';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import flexing from './flexing';
 import combo from './enemyModel';
-import './game.css';
+import '../styles/game.css';
 import { useCamera } from './UseCamera';
 import { Loader } from './Loader.jsx';
 
@@ -89,27 +89,6 @@ combo.then((object) => {
 
   let targetX = object[0].position.x;
   const speed = 0.08;
-
-  // window.addEventListener('keydown', (e) => {
-  //   if (e.key === 'a' || e.key === 'ArrowLeft') {
-
-  //       moveLeft();
-  //   } else if (e.key === 'd' || e.key === 'ArrowRight') {
-  //     moveRight();
-  //   }
-  // });
-
-  const moveLeft = () => {
-    if (targetX > -0.25) {
-      targetX -= 0.25;
-    }
-  };
-
-  const moveRight = () => {
-    if (targetX < 0.25) {
-      targetX += 0.25;
-    }
-  };
 
   const updatePosition = () => {
     object[0].position.x += (targetX - object[0].position.x) * speed;

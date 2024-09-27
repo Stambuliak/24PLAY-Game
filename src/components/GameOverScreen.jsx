@@ -1,4 +1,4 @@
-import "./end.css"
+import "../styles/end.css"
 import React from 'react';
 
 const GameOverScreen = ({ score }) => {
