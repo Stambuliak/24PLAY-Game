@@ -1,13 +1,11 @@
-import { GameField } from './components/GameField';
-import './main.css';
-
 import React from 'react';
-
+import { GameField } from './components/GameField';
+import './components/app.css'
 
 const App = () => (
-  <div>
-    <GameField />
+  <div className='app-container'>
+      <GameField />
   </div>
-  );
+);
 
-  export default App;
+export default App;

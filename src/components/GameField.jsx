@@ -4,11 +4,13 @@ import model from './loader';
 import lavaLoader from './lava';
 import roadLoader from './road';
 import GameOverScreen from './GameOverScreen';
+// import Loader from './Loader.jsx';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import flexing from './flexing';
 import combo from './enemyModel';
 import './game.css';
 import { useCamera } from './UseCamera';
+import { Loader } from './Loader.jsx';
 
 export const GameField = () => {
 const canvasRef = useRef(null);
@@ -16,14 +18,34 @@ const [width, setWidth] = useState(window.innerWidth);
 const [height, setHeight] = useState(window.innerHeight);
 const [gameStarted, setGameStarted] = useState(true);
 const [score, setScore] = useState(0);
+const [isLoading, setIsLoading] = useState(true);
 
-const {camera, enemyPosX} = useCamera(width, height);
+const {camera} = useCamera(width, height);
 
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 
 const textureLoader = new THREE.TextureLoader();
 const clock = new THREE.Clock();
+
+useEffect(() => {
+  const loadModels = async () => {
+    try {
+      await Promise.all([
+        combo,
+        model,
+        flexing,
+        roadLoader,
+        lavaLoader,
+      ]);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error loading models:", error);
+    }
+  };
+
+  loadModels();
+}, []);
 
 useEffect(() => {
   const handleResize = () => {
@@ -43,6 +65,7 @@ useEffect(() => {
 }, [camera]);
 
 useEffect(() => {
+  if (!isLoading) {
 let mixer;
 let enemyMixer;
 let lavaOffset = 0
@@ -190,6 +213,7 @@ const startRoadMovement = () => {
     const animateRoad = () => {
       moveLava();
       moveRoad();
+
       requestAnimationFrame(animateRoad); 
     };
     animateRoad();
@@ -197,7 +221,6 @@ const startRoadMovement = () => {
 };
 
 startRoadMovement();
-
 
   const light = new THREE.DirectionalLight('brown', 1);
   light.position.set(0, -2, 9);
@@ -369,29 +392,34 @@ const animate = () => {
   const delta = clock.getDelta();
   if ( mixer ) mixer.update( delta );
   if ( enemyMixer ) enemyMixer.update( delta );
+
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
 };
 
   animate();
+ }
 // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [camera, height, width, isLoading]);
 
-// return () => {
-//   scene.clear()
-// }
-}, [camera, height, width]);
+return (
+  <div className="game-container">
+    {isLoading ? (
+      <Loader />
+    ) : (
+      <>
+        <h1 className='score'>score: {score}</h1>
+        <div ref={canvasRef} />
+        {!gameStarted && (
+          <div>
+            <GameOverScreen score={score} />
+          </div>
+        )}
+      </>
+    )}
+  </div>
+);
 
-  return (
-    <div className="game-container">
-      <h1 className='score'>score: {score}</h1>
-      <div ref={canvasRef} />
-      {!gameStarted && (
-        <div>
-          <GameOverScreen score={score}/>
-        </div>
-      )}
-    </div>
-  );
 };
 
 export default GameField;
