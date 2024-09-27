@@ -90,14 +90,14 @@ combo.then((object) => {
   let targetX = object[0].position.x;
   const speed = 0.08;
 
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'a' || e.key === 'ArrowLeft') {
+  // window.addEventListener('keydown', (e) => {
+  //   if (e.key === 'a' || e.key === 'ArrowLeft') {
 
-        moveLeft();
-    } else if (e.key === 'd' || e.key === 'ArrowRight') {
-      moveRight();
-    }
-  });
+  //       moveLeft();
+  //   } else if (e.key === 'd' || e.key === 'ArrowRight') {
+  //     moveRight();
+  //   }
+  // });
 
   const moveLeft = () => {
     if (targetX > -0.25) {
