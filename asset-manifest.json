@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/24PLAY-Game/static/css/main.94675390.css",
-    "main.js": "/24PLAY-Game/static/js/main.19a59096.js",
+    "main.css": "/24PLAY-Game/static/css/main.81e8d083.css",
+    "main.js": "/24PLAY-Game/static/js/main.e2f7c899.js",
     "index.html": "/24PLAY-Game/index.html",
-    "main.94675390.css.map": "/24PLAY-Game/static/css/main.94675390.css.map",
-    "main.19a59096.js.map": "/24PLAY-Game/static/js/main.19a59096.js.map"
+    "main.81e8d083.css.map": "/24PLAY-Game/static/css/main.81e8d083.css.map",
+    "main.e2f7c899.js.map": "/24PLAY-Game/static/js/main.e2f7c899.js.map"
   },
   "entrypoints": [
-    "static/css/main.94675390.css",
-    "static/js/main.19a59096.js"
+    "static/css/main.81e8d083.css",
+    "static/js/main.e2f7c899.js"
   ]
 }
