@@ -4,7 +4,6 @@ import model from './loader';
 import lavaLoader from './lava';
 import roadLoader from './road';
 import GameOverScreen from './GameOverScreen';
-// import Loader from './Loader.jsx';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import flexing from './flexing';
 import combo from './enemyModel';
@@ -217,7 +216,7 @@ const startRoadMovement = () => {
       requestAnimationFrame(animateRoad); 
     };
     animateRoad();
-  }, 3700);
+  }, 2700);
 };
 
 startRoadMovement();
